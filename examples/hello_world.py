@@ -43,6 +43,10 @@ case.physics.dose_matrix = dose_matrix
 
 status, run = case.plan()
 
+graphics = CasePlotter(case)
+plan_data = case.plotting_data()
+graphics.plot(plan_data, plotfile='hello_world.png')
+
 print('SOLVER FEASIBLE?: {}'.format(status))
 print('SOLVE TIME: {}'.format(run.solvetime))
 print('NONZERO BEAMS: {}'.format(run.nonzero_beam_count))
