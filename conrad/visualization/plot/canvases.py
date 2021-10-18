@@ -57,11 +57,11 @@ else:
 
 		@property
 		def left(self):
-			return self.axes.is_first_col()
+			return self.axes.get_subplotspec().is_first_col()
 
 		@property
 		def bottom(self):
-			return self.axes.is_last_row()
+			return self.axes.get_subplotspec().is_last_row()
 
 		@property
 		def title(self):
