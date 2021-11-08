@@ -4,9 +4,9 @@
 # In[1]:
 
 
-get_ipython().run_line_magic('load_ext', 'autoreload')
-get_ipython().run_line_magic('autoreload', '2')
-get_ipython().run_line_magic('matplotlib', 'inline')
+##get_ipython().run_line_magic('load_ext', 'autoreload')
+##get_ipython().run_line_magic('autoreload', '2')
+##get_ipython().run_line_magic('matplotlib', 'inline')
 
 
 # In[2]:
@@ -37,7 +37,7 @@ case.anatomy += Structure(1, 'avoid', False)
 
 # populate case physics
 # generate random dose influence matrix, 1000 voxels x 200 beams
-case.physics.dose_matrix = np.random.rand(1000, 200)
+dm = np.random.rand(1000, 200)
 
 # randomly label voxels as 0 (tumor, ~20% of voxels) or 1 (avoid, ~80% of voxels) 
 case.physics.voxel_labels = (np.random.rand(1000) > 0.2).astype(int)
@@ -46,7 +46,9 @@ case.physics.voxel_labels = (np.random.rand(1000) > 0.2).astype(int)
 FACTOR = 3
 for i, label in enumerate(case.physics.voxel_labels):
     if label == 0:
-        case.physics.dose_matrix[i, :] *= FACTOR
+        dm[i, :] *= FACTOR
+
+case.physics.dose_matrix = dm
 
 
 # In[6]:
@@ -67,8 +69,9 @@ print('SOLVER CONVERGED?', status)
 graphics = CasePlotter(case)
 
 # plot data from run
-graphics.plot(run)
-
+##graphics.plot(run)
+plan_data = case.plotting_data()
+graphics.plot(plan_data, plotfile='Basic.png')
 
 # In[ ]:
 
