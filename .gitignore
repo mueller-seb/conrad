@@ -64,6 +64,10 @@ target/
 
 #test plots
 *.pdf
+*.png
 
 #macOS
 *.DS_Store
+
+#PyCharm
+.idea
