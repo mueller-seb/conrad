@@ -69,9 +69,8 @@ print('SOLVER CONVERGED?', status)
 graphics = CasePlotter(case)
 
 # plot data from run
-##graphics.plot(run)
-plan_data = case.plotting_data()
-graphics.plot(plan_data, plotfile='Basic.png')
+#plan_data = case.plotting_data()
+graphics.plot(run.plotting_data, plotfile='Basic.png')
 
 # In[ ]:
 

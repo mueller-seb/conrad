@@ -474,7 +474,9 @@ class Case(object):
 
 		# update doses
 		if run.feasible:
-			run.plotting_data[0] = self.plotting_data(x=run.x)
+			## causes data.items() no attribute error in filter_data when calling plot(run.plotting_data) because nested dict is produced
+			## run.plotting_data[0] = self.plotting_data(x=run.x)
+			run.plotting_data = self.plotting_data(x=run.x)
 			if use_2pass:
 				run.plotting_data['exact'] = self.plotting_data(x=run.x_exact)
 		else:
