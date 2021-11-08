@@ -4,9 +4,9 @@
 # In[1]:
 
 
-get_ipython().run_line_magic('load_ext', 'autoreload')
-get_ipython().run_line_magic('autoreload', '2')
-get_ipython().run_line_magic('matplotlib', 'inline')
+##get_ipython().run_line_magic('load_ext', 'autoreload')
+##get_ipython().run_line_magic('autoreload', '2')
+##get_ipython().run_line_magic('matplotlib', 'inline')
 
 
 # In[2]:
@@ -59,7 +59,7 @@ case.anatomy['OAR'].constraints += D(50) < 0.4 * Gy
 # solve: WITHOUT slack, ONE pass (restricted DVH constraints)
 status, run = case.plan(use_slack=False)
 print('SOLVER CONVERGED?', status)
-graphics.plot(run)
+graphics.plot(run.plotting_data, plotfile='DVH_Constraints1.png')
 
 
 # In[7]:
@@ -68,7 +68,7 @@ graphics.plot(run)
 # solve: WITHOUT slack, TWO passes (exact DVH constraints)
 status, run = case.plan(use_slack=False, use_2pass=True)
 print('SOLVER CONVERGED?', status)
-graphics.plot(run, second_pass=True)
+graphics.plot(run.plotting_data, second_pass=True, plotfile='DVH_Constraints2.png')
 
 
 # In[8]:
@@ -94,7 +94,7 @@ print('SOLVER CONVERGED?', status)
 # (N.B.: use_slack=True by default, so could call w/o use_slack argument)
 status, run = case.plan(use_slack=True)
 print('SOLVER CONVERGED?', status)
-graphics.plot(run)
+graphics.plot(run.plotting_data, plotfile='DVH_Constraints3.png')
 
 
 # In[11]:
@@ -103,7 +103,7 @@ graphics.plot(run)
 # solve: WITH slack, TWO passes 
 status, run = case.plan(use_2pass=True)
 print('SOLVER CONVERGED?', status)
-graphics.plot(run, second_pass=True)
+graphics.plot(run.plotting_data, second_pass=True, plotfile='DVH_Constraints4.png')
 
 
 # In[ ]:
