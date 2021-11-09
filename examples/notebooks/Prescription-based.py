@@ -4,9 +4,9 @@
 # In[ ]:
 
 
-get_ipython().run_line_magic('load_ext', 'autoreload')
-get_ipython().run_line_magic('autoreload', '2')
-get_ipython().run_line_magic('matplotlib', 'inline')
+##get_ipython().run_line_magic('load_ext', 'autoreload')
+##get_ipython().run_line_magic('autoreload', '2')
+##get_ipython().run_line_magic('matplotlib', 'inline')
 
 
 # In[ ]:
@@ -74,7 +74,7 @@ print(case.anatomy)
 
 
 _, run = case.plan()
-graphics.plot(run)
+graphics.plot(run.plotting_data, plotfile="Prescription-based1.png")
 
 
 # In[ ]:
@@ -84,7 +84,7 @@ graphics.plot(run)
 case.transfer_rx_constraints_to_anatomy()
 print(case.anatomy)
 _, run = case.plan()
-graphics.plot(run)
+graphics.plot(run.plotting_data, plotfile="Prescription-based2.png")
 
 
 # In[ ]:
@@ -94,7 +94,7 @@ graphics.plot(run)
 case = Case(physics=physics, prescription=rx)
 print(case.anatomy)
 _, run = case.plan()
-graphics.plot(run)
+graphics.plot(run.plotting_data, plotfile="Prescription-based3.png")
 
 
 # In[ ]:
@@ -104,7 +104,7 @@ graphics.plot(run)
 case = Case(physics=physics, prescription=prescription)
 print(case.anatomy)
 _, run = case.plan()
-graphics.plot(run)
+graphics.plot(run.plotting_data, plotfile="Prescription-based4.png")
 
 
 # In[ ]:
@@ -119,7 +119,7 @@ case.prescription = rx
 # an already-initialized case 
 print(case.anatomy)
 _, run = case.plan()
-graphics.plot(run)
+graphics.plot(run.plotting_data, plotfile="Prescription-based5.png")
 
 
 # In[ ]:
@@ -129,7 +129,7 @@ graphics.plot(run)
 case.transfer_rx_constraints_to_anatomy()
 print(case.anatomy)
 _, run = case.plan()
-graphics.plot(run)
+graphics.plot(run.plotting_data, plotfile="Prescription-based6.png")
 
 
 # In[ ]:
@@ -140,7 +140,7 @@ case = Case(physics=physics)
 case.prescription = prescription
 print(case.anatomy)
 _, run = case.plan()
-graphics.plot(run)
+graphics.plot(run.plotting_data, plotfile="Prescription-based7.png")
 
 
 # In[ ]:
@@ -150,5 +150,5 @@ graphics.plot(run)
 case.transfer_rx_constraints_to_anatomy()
 print(case.anatomy)
 _, run = case.plan()
-graphics.plot(run)
+graphics.plot(run.plotting_data, plotfile="Prescription-based8.png")
 
