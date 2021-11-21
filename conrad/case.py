@@ -415,7 +415,7 @@ class Case(object):
 				self.load_physics_to_anatomy()
 		return self.anatomy.plannable
 
-	def plan(self, use_slack=True, use_2pass=False, **options):
+	def plan(self, use_slack=True, use_2pass=False, use_mpip=False, **options):
 		"""
 		Invoke numerical solver to optimize plan, given state of :class:`Case`.
 
@@ -458,6 +458,8 @@ class Case(object):
 		# dose constraint slack: ON by default
 		use_slack = options.pop('dvh_slack', use_slack)
 
+		use_mpip = options.pop('use_mpip', use_mpip)
+
 		# objective weight for slack minimization
 		gamma = options['gamma'] = options.pop('slack_penalty', None)
 
@@ -469,7 +471,7 @@ class Case(object):
 
 		# solve problem
 		feas = self.problem.solve(self.anatomy.list, run.output,
-								 slack=use_slack, exact_constraints=use_2pass,
+								 slack=use_slack, exact_constraints=use_2pass, mpip=use_mpip,
 								 **options)
 
 		# update doses

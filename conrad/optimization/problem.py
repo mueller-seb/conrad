@@ -27,6 +27,7 @@ import os
 from conrad.medicine.dose import PercentileConstraint
 from conrad.optimization.solver_cvxpy import SolverCVXPY
 from conrad.optimization.solver_optkit import SolverOptkit
+from conrad.optimization.solver_mpip import SolverMPIP
 from conrad.optimization.history import RunOutput
 
 class PlanningProblem(object):
@@ -54,6 +55,7 @@ class PlanningProblem(object):
 		"""
 		self.solver_cvxpy = SolverCVXPY()
 		self.solver_pogs = SolverOptkit()
+		self.solver_mpip = SolverMPIP()
 		self.__solver = None
 
 	@property
@@ -278,7 +280,7 @@ class PlanningProblem(object):
 		return percentile_constraints_included
 
 	def solve(self, structures, run_output, slack=True,
-			  exact_constraints=False, **options):
+			  exact_constraints=False, mpip=False, **options):
 		"""
 		Run treatment plan optimization.
 
@@ -329,9 +331,15 @@ class PlanningProblem(object):
 		use_slack = options.pop('dvh_slack', slack)
 		use_2pass = options.pop('dvh_exact', exact_constraints)
 		use_2pass &= self.__verify_2pass_applicable(structures)
-		self.__set_solver_fastest_available(structures)
+
+		use_mpip = options.pop('use_mpip', mpip)
+		if use_mpip is True:
+			self.__solver = self.solver_mpip
+		else:
+			self.__set_solver_fastest_available(structures)
+
 		self.solver.init_problem(n_beams, use_slack=use_slack,
-								 use_2pass=use_2pass, **options)
+								 use_2pass=use_2pass, use_mpip=use_mpip, **options)
 
 		# build problem
 		construction_report = self.solver.build(structures, **options)
