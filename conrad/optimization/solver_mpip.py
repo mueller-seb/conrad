@@ -293,13 +293,12 @@ class SolverMPIP(Solver):
 			x = np.zeros(self.n_beams)
 			Shat = set(range(self.n_beams))
 			S = set()
-			lbd = 0.001
-			Q0 = 0.02
-			Qtilde = 1000.0
-			Qtildeold = 1001.0
+			lbd = 0.0
+			Q0 = 0.01
+			Qtilde = self.Qtilde(x, lbd)
+			Qtildeold = Qtilde + 1
 			k = 1
 			while (Q0 < Qtilde) & (Qtilde < Qtildeold) & (k<maxiter):
-			#for z in range(100):
 				Qtildeold = Qtilde
 				jstar, Qtilde = self.minSeed(Shat - S, x, 1, lbd)
 				x[jstar] = x[jstar]	+ 1
@@ -307,7 +306,7 @@ class SolverMPIP(Solver):
 				S.add(jstar)
 				if len(Sold) > 0:
 					rstar, Qtilde2 = self.minSeed(Sold, x, -1, lbd)
-					if Qtilde2 < Qtilde:
+					if Qtilde2 < Qtildeold:
 						x[rstar] = x[rstar] - 1
 						S.remove(rstar)
 						Qtilde = Qtilde2
