@@ -91,6 +91,8 @@ class SolverMPIP(Solver):
 			self.__constraint_indices = {}
 			self.constraint_dual_vars = {}
 			self.__solvetime = np.nan
+			self.__status = None
+			self.__value = None
 
 			if isinstance(n_beams, int):
 				self.init_problem(n_beams, **options)
@@ -149,11 +151,13 @@ class SolverMPIP(Solver):
 			self.dvh_vars = {}
 			self.slack_vars = {}
 			self.constraint_dual_vars = {}
+			self.__status = None
+			self.__value = None
 
 		@property
 		def x(self):
 			""" Vector variable of beam intensities, x. """
-			return conrad_vec(self.__x.value)
+			return conrad_vec(self.__x)
 
 		@property
 		def x_dual(self):
@@ -175,17 +179,17 @@ class SolverMPIP(Solver):
 		@property
 		def status(self):
 			""" Solver status. """
-			return self.problem.status
+			return self.__status
 
 		@property
 		def objective_value(self):
 			""" Objective value at end of solve. """
-			return self.problem.value
+			return self.__value
 
 		@property
 		def solveiters(self):
 			""" Number of solver iterations performed. """
-			return 'n/a'
+			return self.__solveiters
 
 		def __objective_expression(self, structure):
 			structure.normalize_objective()
@@ -279,25 +283,22 @@ class SolverMPIP(Solver):
 			# solver options
 			##solver = options.pop('solver', SOLVER_DEFAULT)
 			##reltol = float(options.pop('reltol', RELTOL_DEFAULT))
-			##maxiter = int(options.pop('maxiter', MAXITER_DEFAULT))
+			maxiter = int(options.pop('maxiter', MAXITER_DEFAULT))
 			##use_gpu = bool(options.pop('gpu', GPU_DEFAULT))
 			##use_indirect = bool(options.pop('use_indirect', INDIRECT_DEFAULT))
 
 			# solve
 			PRINT('running solver...')
-			start = time.clock
+			start = time.clock()
 			x = np.zeros(self.n_beams)
-			#Shat = np.arange(1, self.n_beams)
 			Shat = set(range(self.n_beams))
 			S = set()
-			maxiter = 100
 			lbd = 0.001
-			#for k in range(1, maxiter):
 			Q0 = 0.02
 			Qtilde = 1000.0
 			Qtildeold = 1001.0
 			k = 1
-			while (Q0 < Qtilde) & (Qtilde < Qtildeold):
+			while (Q0 < Qtilde) & (Qtilde < Qtildeold) & (k<maxiter):
 			#for z in range(100):
 				Qtildeold = Qtilde
 				jstar, Qtilde = self.minSeed(Shat - S, x, 1, lbd)
@@ -311,12 +312,14 @@ class SolverMPIP(Solver):
 						S.remove(rstar)
 						Qtilde = Qtilde2
 				k = k+1
-			tau = x
-
+			self.__x = x
 			self.__solvetime = time.clock() - start
+			self.__solveiters = k
+			self.__status = 'optimal'
+			self.__value = self.Qtilde(x, lbd)
 
 
-			PRINT("status: {}".format(self.problem.status))
-			PRINT("optimal value: {}".format(self.problem.value))
+			PRINT("status: {}".format(self.__status))
+			PRINT("optimal value: {}".format(self.__value))
 
-			return ret != np.inf and not isinstance(ret, str)
+			return True

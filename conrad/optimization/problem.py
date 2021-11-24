@@ -66,6 +66,8 @@ class PlanningProblem(object):
 				return self.solver_cvxpy
 			elif self.solver_pogs is not None:
 				return self.solver_pogs
+			elif self.solver_mpip is not None:
+				return self.solver_mpip
 			else:
 				raise ValueError('no solvers avaialable')
 		else:
