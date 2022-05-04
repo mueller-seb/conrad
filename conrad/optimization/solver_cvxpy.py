@@ -500,6 +500,7 @@ if module_installed('cvxpy'):
 				objective = cvxpy.Minimize(ObjectiveMethods.expr(s, self.__x))
 				self.problem = cvxpy.Problem(self.problem.objective + objective, self.problem.constraints)
 				self.__add_constraints(s, exact=exact)
+			self.problem = cvxpy.Problem(self.problem.objective + cvxpy.Minimize(cvxpy.norm(self.__x, 1)), self.problem.constraints)
 
 			# self.problem.objective = cvxpy.Minimize(
 			# 		weight_abs.T * cvxpy.abs(A * self.__x - dose) +
