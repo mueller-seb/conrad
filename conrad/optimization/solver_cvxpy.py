@@ -105,7 +105,7 @@ if module_installed('cvxpy'):
 			Initialize :mod:`cvxpy` variables and problem components.
 
 			Create a :class:`cvxpy.Variable` of length-``n_beams`` to
-			representthe beam  intensities. Invoke
+			represent the beam  intensities. Invoke
 			:meth:`SolverCVXPY.clear` to build minimal problem.
 
 			Arguments:
@@ -129,6 +129,7 @@ if module_installed('cvxpy'):
 			self.use_slack = use_slack
 			self.use_2pass = use_2pass
 			self.gamma = options.pop('gamma', GAMMA_DEFAULT)
+			self.tau = options.pop('tau', TAU_DEFAULT)
 
 		@property
 		def n_beams(self):
@@ -500,7 +501,8 @@ if module_installed('cvxpy'):
 				objective = cvxpy.Minimize(ObjectiveMethods.expr(s, self.__x))
 				self.problem = cvxpy.Problem(self.problem.objective + objective, self.problem.constraints)
 				self.__add_constraints(s, exact=exact)
-			self.problem = cvxpy.Problem(self.problem.objective + cvxpy.Minimize(cvxpy.norm(self.__x, 1)), self.problem.constraints)
+			if 'tau' in options:
+				self.problem = cvxpy.Problem(self.problem.objective + options['tau']*cvxpy.Minimize(cvxpy.norm(self.__x, 1)), self.problem.constraints)
 
 			# self.problem.objective = cvxpy.Minimize(
 			# 		weight_abs.T * cvxpy.abs(A * self.__x - dose) +

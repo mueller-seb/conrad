@@ -47,6 +47,7 @@ import numpy as np
 import abc
 
 GAMMA_DEFAULT = 1e-2
+TAU_DEFAULT = 0
 RELTOL_DEFAULT = 1e-3
 ABSTOL_DEFAULT = 1e-4
 VERBOSE_DEFAULT = 1
@@ -93,6 +94,7 @@ class Solver(object):
 		self.use_slack = True
 		self.__x = None
 		self.__gamma = GAMMA_DEFAULT
+		self.__tau = TAU_DEFAULT
 		self.dvh_vars = {}
 		self.slack_vars = {}
 		self.feasible = False
@@ -108,6 +110,15 @@ class Solver(object):
 	def gamma(self, gamma):
 		if gamma:
 			self.__gamma = float(gamma)
+
+	@property
+	def tau(self):
+		return self.__tau
+
+	@tau.setter
+	def tau(self, tau):
+		if tau:
+			self.__tau = float(tau)
 
 	@property
 	def global_weight_scaling(self):

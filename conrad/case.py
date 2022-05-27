@@ -461,11 +461,14 @@ class Case(object):
 		# objective weight for slack minimization
 		gamma = options['gamma'] = options.pop('slack_penalty', None)
 
+		tau = options['tau'] = options.pop('sparsity_penalty', None)
+
 		run = RunRecord(
 				self.anatomy.list,
 				use_2pass=use_2pass,
 				use_slack=use_slack,
-				gamma=gamma)
+				gamma=gamma,
+				tau=tau)
 
 		# solve problem
 		feas = self.problem.solve(self.anatomy.list, run.output,

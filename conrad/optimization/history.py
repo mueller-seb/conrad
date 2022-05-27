@@ -47,7 +47,7 @@ class RunProfile(object):
 	"""
 
 	def __init__(self, structures=None, use_slack=True, use_2pass=False,
-				 gamma='default'):
+				 gamma='default', tau='default'):
 		"""
 		Initialize and populate a `RunProfile`.
 
@@ -73,6 +73,8 @@ class RunProfile(object):
 
 		# weight used for slack minimization objective
 		self.gamma = gamma
+
+		self.tau = tau
 
 		if structures is not None:
 			self.pull_objectives(structures)
@@ -187,7 +189,7 @@ class RunRecord(object):
 	"""
 
 	def __init__(self, structures=None, use_slack=True, use_2pass=False,
-				 gamma='default'):
+				 gamma='default', tau='default'):
 		"""
 		Initialize :class:`RunRecord`.
 
@@ -209,7 +211,8 @@ class RunRecord(object):
 				structures=structures,
 				use_slack=use_slack,
 				use_2pass=use_2pass,
-				gamma=gamma)
+				gamma=gamma,
+				tau=tau)
 		self.output = RunOutput()
 		self.plotting_data = {0: None, 'exact': None}
 
