@@ -239,10 +239,10 @@ class NontargetObjectiveLinear(TreatmentObjective):
 
 	def primal_expr_Ax(self, A, x_var, voxel_weights=None):
 		if voxel_weights is None:
-			return self.weight * cvxpy.sum(x_var.T * A.T)
+			return self.weight * cvxpy.sum(x_var.T @ A.T)
 		else:
 			return self.weight * cvxpy.sum(
-					cvxpy.multiply(voxel_weights, (x_var.T * A.T).T))
+					cvxpy.multiply(voxel_weights, (x_var.T @ A.T).T))
 
 	def dual_expr(self, nu_var, voxel_weights=None):
 		""" Return ``0``"""
@@ -354,7 +354,7 @@ class TargetObjectivePWL(TreatmentObjective):
 			self.weight_linear * cvxpy.sum(residuals)
 
 	def primal_expr_Ax(self, A, x_var, voxel_weights=None):
-		residuals = (x_var.T * A.T).T - float(self.target_dose)
+		residuals = (x_var.T @ A.T).T - float(self.target_dose)
 		if voxel_weights is not None:
 			residuals = cvxpy.multiply(voxel_weights, residuals)
 		return self.weight_abs * cvxpy.norm(residuals, 1) + \
@@ -445,7 +445,7 @@ class ObjectiveHinge(TreatmentObjective):
 		return self.weight * cvxpy.sum(residuals)
 
 	def primal_expr_Ax(self, A, x_var, voxel_weights=None):
-		residuals = cvxpy.pos((x_var.T * A.T).T - float(self.deadzone_dose))
+		residuals = cvxpy.pos((x_var.T @ A.T).T - float(self.deadzone_dose))
 		if voxel_weights is not None:
 			residuals = cvxpy.multiply(voxel_weights, residuals)
 		return self.weight * cvxpy.sum(residuals)

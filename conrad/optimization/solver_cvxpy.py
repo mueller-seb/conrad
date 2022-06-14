@@ -200,7 +200,7 @@ if module_installed('cvxpy'):
 			if slack is None:
 				slack = 0.
 			return cvxpy.sum(cvxpy.pos(
-					beta + sign * (A*x - (dose + sign * slack)) )) <= beta * p
+					beta + sign * (A@x - (dose + sign * slack)) )) <= beta * p
 
 		@staticmethod
 		def __percentile_constraint_exact(A, x, y, constr, had_slack=False):
@@ -232,7 +232,7 @@ if module_installed('cvxpy'):
 			dose = constr.dose_achieved if had_slack else constr.dose
 			idx_exact = constr.get_maxmargin_fulfillers(y, had_slack)
 			A_exact = np.copy(A[idx_exact, :])
-			return sign * (A_exact * x - dose.value) <= 0
+			return sign * (A_exact @ x - dose.value) <= 0
 
 		def __add_constraints(self, structure, exact=False):
 			"""
@@ -314,20 +314,20 @@ if module_installed('cvxpy'):
 				if isinstance(c, MeanConstraint):
 					if c.upper:
 						self.constraints += [
-								structure.A_mean * self.__x - slack <=
+								structure.A_mean @ self.__x - slack <=
 								c.dose.value]
 					else:
 						self.constraints += [
-								structure.A_mean * self.__x + slack >=
+								structure.A_mean @ self.__x + slack >=
 								c.dose.value]
 
 				elif isinstance(c, MinConstraint):
 					self.constraints += \
-						[structure.A * self.__x >= c.dose.value]
+						[structure.A @ self.__x >= c.dose.value]
 
 				elif isinstance(c, MaxConstraint):
 					self.constraints += \
-						[structure.A * self.__x <= c.dose.value]
+						[structure.A @ self.__x <= c.dose.value]
 
 				elif isinstance(c, PercentileConstraint):
 					if exact:
@@ -461,10 +461,10 @@ if module_installed('cvxpy'):
 		def __objective_expression(self, structure):
 			structure.normalize_objective()
 			if structure.collapsable:
-				return structure.objective.expr(structure.A_mean.T * self.__x)
+				return structure.objective.expr(structure.A_mean.T @ self.__x)
 			else:
 				return structure.objective.expr(
-						structure.A * self.x, structure.voxel_weights)
+						structure.A @ self.x, structure.voxel_weights)
 
 		def build(self, structures, exact=False, **options):
 			"""
