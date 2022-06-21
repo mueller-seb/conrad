@@ -13,6 +13,7 @@ WEIGHT_PWL_UNDER_DEFAULT = 1.
 WEIGHT_PWL_OVER_DEFAULT = 0.05
 WEIGHT_HINGE_DEFAULT = 1.
 WEIGHT_LIN_NONTARGET_DEFAULT = 0.03
+WEIGHT_SQR_DEFAULT = 0.5
 
 OPTKIT_INSTALLED = module_installed('optkit')
 if OPTKIT_INSTALLED:
@@ -275,6 +276,91 @@ class NontargetObjectiveLinear(TreatmentObjective):
 		else:
 			raise NotImplementedError
 
+class NontargetObjectiveSquare(TreatmentObjective):
+	def __init__(self, weight=None, **options):
+		if weight is None:
+			weight = options.pop('w', WEIGHT_SQR_DEFAULT)
+
+		TreatmentObjective.__init__(self, weight=weight)
+		self._TreatmentObjective__add_aliases(
+				'weight', 'wt', 'w')
+
+	@property
+	def is_target_objective(self):
+		return False
+
+	@property
+	def is_nontarget_objective(self):
+		return True
+
+	def primal_eval(self, y, voxel_weights=None):
+		r"""
+		Return :math:`c * \omega^T y^2`, for
+		:math:`\omega\equiv```voxel_weights``
+		"""
+		if voxel_weights is None:
+			return self.weight * np.sum(y**2)
+		else:
+			return self.weight * np.dot(voxel_weights, y**2)
+
+	def dual_eval(self, nu, voxel_weights=None):
+		""" Return ``0``"""
+		#return 0
+		raise NotImplementedError
+
+	def primal_expr(self, y_var, voxel_weights=None):
+		r"""
+		Return :math:`c * \omega^T y^2`, for :math:`\omega\equiv```voxel_weights``
+		"""
+		if voxel_weights is None:
+			return self.weight * cvxpy.sum(y_var**2)
+		else:
+			return self.weight * cvxpy.sum(
+					cvxpy.multiply(voxel_weights, y_var**2))
+
+	def primal_expr_Ax(self, A, x_var, voxel_weights=None):
+		if voxel_weights is None:
+			return self.weight * cvxpy.sum((x_var.T @ A.T)**2)
+		else:
+			return self.weight * cvxpy.sum(
+					cvxpy.multiply(voxel_weights, (x_var.T @ A.T).T**2))
+
+	def dual_expr(self, nu_var, voxel_weights=None):
+		""" Return ``0``"""
+		#return 0
+		raise NotImplementedError
+
+	def dual_domain_constraints(self, nu_var, voxel_weights=None):
+		r"""
+		Return constraint :math:`\omega\nu = c`
+		"""
+		#weight_vec = 1. if voxel_weights is None else voxel_weights
+		#return nu_var == self.weight * weight_vec
+		raise NotImplementedError
+
+	def primal_expr_pogs(self, size, voxel_weights=None):
+		if OPTKIT_INSTALLED:
+			#weight_vec = 1. if voxel_weights is None else voxel_weights
+			#return ok.api.PogsObjective(
+			#size, h='Zero', c=0, d=weight_vec * self.weight)
+			raise NotImplementedError
+		else:
+			raise NotImplementedError
+
+	def dual_expr_pogs(self, size, voxel_weights=None):
+		if OPTKIT_INSTALLED:
+			#return ok.api.PogsObjective(0)
+			raise NotImplementedError
+		else:
+			raise NotImplementedError
+
+	def dual_domain_constraints_pogs(self, size, voxel_weights=None):
+		if OPTKIT_INSTALLED:
+			#raise NotImplementedError
+			raise NotImplementedError
+		else:
+			raise NotImplementedError
+
 class TargetObjectivePWL(TreatmentObjective):
 	def __init__(self, target_dose=None, weight_underdose=None,
 				 weight_overdose=None, **options):
@@ -406,6 +492,116 @@ class TargetObjectivePWL(TreatmentObjective):
 		else:
 			raise NotImplementedError
 
+class TargetObjectiveSquare(TreatmentObjective):
+	def __init__(self, target_dose=None, weight=None, **options):
+		if weight is None:
+			weight = options.pop(
+					'weight',
+					options.pop('w', WEIGHT_SQR_DEFAULT))
+
+		if target_dose is None:
+			target_dose = options.pop('dose', 1 * Gy)
+		TreatmentObjective.__init__(
+				self, weight=weight, target_dose=target_dose)
+		self._TreatmentObjective__add_aliases(
+				'wt', 'weight', 'w')
+		self._TreatmentObjective__add_aliases('target_dose', 'dose')
+
+	@property
+	def is_target_objective(self):
+		return True
+
+	@property
+	def is_nontarget_objective(self):
+		return False
+
+	def primal_eval(self, y, voxel_weights=None):
+		r"""
+		Return :math:`w_+ \omega^T(y-d)_+ + w_-\omega^T(y-d)_-`, for
+		:math:`\omega \equiv` ``voxel weights``.
+		"""
+		residuals = vec(y) - float(self.target_dose)
+		if voxel_weights is None:
+			return float(
+					self.weight * np.sum(residuals**2))
+		else:
+			return float(
+					self.weight * np.dot(voxel_weights, residuals**2))
+
+	def dual_eval(self, nu, voxel_weights=None):
+		r"""
+		Return :math:`-d^T\nu`
+		"""
+		#if voxel_weights is None:
+		#	return -float(self.target_dose) * np.sum(nu)
+		#else:
+		#	return -float(self.target_dose) * np.dot(voxel_weights, nu)
+		raise NotImplementedError
+
+	def primal_expr(self, y_var, voxel_weights=None):
+		residuals = y_var.T - float(self.target_dose)
+		if voxel_weights is not None:
+			return self.weight * cvxpy.sum(cvxpy.multiply(voxel_weights, residuals.T**2))
+		else:
+			return self.weight * cvxpy.sum(residuals**2)
+
+	def primal_expr_Ax(self, A, x_var, voxel_weights=None):
+		residuals = (x_var.T @ A.T).T - float(self.target_dose)
+		if voxel_weights is not None:
+			return self.weight * cvxpy.sum(cvxpy.multiply(voxel_weights, residuals**2))
+		else:
+			return self.weight * cvxpy.sum(residuals**2)
+
+	def dual_expr(self, nu_var, voxel_weights=None):
+		#if voxel_weights is None:
+		#	return -float(self.target_dose) * cvxpy.sum(nu_var)
+		#else:
+		#	return -float(self.target_dose) * cvxpy.sum(
+		#			cvxpy.multiply(voxel_weights, nu_var))
+		raise NotImplementedError
+
+	def dual_domain_constraints(self, nu_var, voxel_weights=None):
+		"""
+		Return the constraint :math:`-w_- \le \nu \le w_+`.
+		"""
+		#upper_bound = self.weight_overdose
+		#lower_bound = -self.weight_underdose
+		#if voxel_weights is None:
+		#	voxel_weights = 1
+		#else:
+		#	voxel_weights = vec(voxel_weights)
+		#return [
+		#		nu_var <= voxel_weights * upper_bound,
+		#		nu_var >= voxel_weights * lower_bound
+		#]
+		raise NotImplementedError
+
+	def primal_expr_pogs(self, size, voxel_weights=None):
+		if OPTKIT_INSTALLED:
+			#weights = 1. if voxel_weights is None else vec(voxel_weights)
+			#return ok.api.PogsObjective(
+			#		size, h='Abs', b=float(self.target_dose),
+			#		c=weights * self.weight_abs,
+			#		d=weights * self.weight_linear)
+			raise NotImplementedError
+		else:
+			raise NotImplementedError
+
+	def dual_expr_pogs(self, size, voxel_weights=None):
+		if OPTKIT_INSTALLED:
+			#weights = 1. if voxel_weights is None else vec(voxel_weights)
+			#return ok.api.PogsObjective(
+			#		size, h='Zero', d=-float(self.target_dose) * weights)
+			raise NotImplementedError
+		else:
+			raise NotImplementedError
+
+	def dual_domain_constraints_pogs(self, size, voxel_weights=None):
+		if OPTKIT_INSTALLED:
+			raise NotImplementedError
+		else:
+			raise NotImplementedError
+
 class ObjectiveHinge(TreatmentObjective):
 	def __init__(self, deadzone_dose=None, weight=None, **options):
 		if weight is None:
@@ -500,7 +696,9 @@ def dictionary_to_objective(**options):
 
 OBJECTIVE_TO_STRING = {
 	NontargetObjectiveLinear: 'nontarget_linear',
+	NontargetObjectiveSquare: 'nontarget_square',
 	TargetObjectivePWL: 'target_piecewiselinear',
+	TargetObjectiveSquare: 'target_square',
 	ObjectiveHinge: 'hinge',
 }
 STRING_TO_OBJECTIVE = {v: k for k, v in OBJECTIVE_TO_STRING.items()}

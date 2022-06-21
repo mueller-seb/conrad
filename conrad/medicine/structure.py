@@ -39,12 +39,13 @@ from conrad.physics.units import cm3, Gy, DeliveredDose
 from conrad.medicine.dose import Constraint, MeanConstraint, ConstraintList, \
 								 PercentileConstraint, DVH, RELOPS
 from conrad.optimization.objectives import TreatmentObjective, \
-										   NontargetObjectiveLinear, \
-										   TargetObjectivePWL
+	NontargetObjectiveLinear, \
+	TargetObjectivePWL, TargetObjectiveSquare, NontargetObjectiveSquare
 
 W_UNDER_DEFAULT = 1.
 W_OVER_DEFAULT = 0.05
 W_NONTARG_DEFAULT = 0.025
+W_DEFAULT = 0.5
 
 class Structure(object):
 	"""
@@ -121,12 +122,18 @@ class Structure(object):
 		self.constraints = ConstraintList()
 
 		objective = options.pop('objective', None)
+		approach = options.pop('approach', 'PWL')
 		if objective is not None:
 			self.objective = objective
 		else:
+			if approach == 'NNLS':
+				constructor_default = (TargetObjectiveSquare if is_target
+				else NontargetObjectiveSquare)
+			else:
+				constructor_default = (TargetObjectivePWL if is_target
+				else NontargetObjectiveLinear)
 			objective_constructor = options.pop(
-					'objective_constructor', TargetObjectivePWL if is_target
-					else NontargetObjectiveLinear)
+					'objective_constructor', constructor_default)
 			self.objective = objective_constructor(**options)
 
 		if size is not None:
@@ -217,7 +224,7 @@ class Structure(object):
 	def collapsable(self):
 		""" ``True`` if optimization can be performed with mean dose only. """
 		return self.constraints.mean_only and isinstance(
-				self.objective, NontargetObjectiveLinear)
+				self.objective, (NontargetObjectiveLinear, NontargetObjectiveSquare))
 
 	@property
 	def A_full(self):
