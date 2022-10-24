@@ -122,11 +122,11 @@ class Structure(object):
 		self.constraints = ConstraintList()
 
 		objective = options.pop('objective', None)
-		approach = options.pop('approach', 'PWL')
+		DBOF = options.pop('DBOF', 'PWL')
 		if objective is not None:
 			self.objective = objective
 		else:
-			if approach == 'NNLS':
+			if DBOF == 'SQR':
 				constructor_default = (TargetObjectiveSquare if is_target
 				else NontargetObjectiveSquare)
 			else:
