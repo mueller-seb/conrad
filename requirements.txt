@@ -8,3 +8,4 @@ ecos
 scs
 cvxpy
 matplotlib
+setuptools==57.5.0
