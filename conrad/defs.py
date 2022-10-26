@@ -36,7 +36,8 @@ import pip
 import operator as op
 import numpy as np
 import scipy.sparse as sp
-from pip._internal.utils.misc import get_installed_distributions
+##from pip._internal.utils.misc import get_installed_distributions
+import pkg_resources
 
 def println(*args):
 	print(args)
@@ -115,16 +116,17 @@ def module_installed(name, version_string=None):
 		dictionary values returned by
 		:func:`pip.get_installed_distributions`.
 	"""
-	modules = get_installed_distributions()
+	##modules = get_installed_distributions()
+	modules = ["%s==%s" % (i.key, i.version) for i in pkg_resources.working_set]
 	index = -1
 
 	installed = False
 	for idx, module in enumerate(modules):
-		if name in str(module):
+		if name in module:
 			index = idx
 			installed = True
 
 	if version_string:
-		installed &= str(version_string) in str(modules[index])
+		installed &= version_string in modules[index]
 
 	return installed
