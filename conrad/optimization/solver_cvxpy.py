@@ -539,7 +539,7 @@ if module_installed('cvxpy'):
 
 			# solve
 			PRINT('running solver...')
-			start = time.clock()
+			start = time.process_time()
 			if solver == cvxpy.ECOS:
 				ret = self.problem.solve(
 						solver=cvxpy.ECOS,
@@ -556,7 +556,8 @@ if module_installed('cvxpy'):
 							verbose=VERBOSE,
 							max_iters=maxiter,
 							eps=reltol,
-							gpu=use_gpu)
+							gpu=use_gpu,
+							use_indirect=True)
 				else:
 					ret = self.problem.solve(
 							solver=cvxpy.SCS,
@@ -567,7 +568,7 @@ if module_installed('cvxpy'):
 			else:
 				raise ValueError('invalid solver specified: {}\n'
 								 'no optimization performed'.format(solver))
-			self.__solvetime = time.clock() - start
+			self.__solvetime = time.process_time() - start
 
 
 			PRINT("status: {}".format(self.problem.status))
