@@ -267,7 +267,7 @@ class Constraint(object):
 	def slack(self, slack):
 		# TODO: Remove this once we find bug that is turning slack into 1-element array.
 		if isinstance(slack, np.ndarray) and slack.size == 1:
-			slack = np.asscalar(slack)
+			slack = np.ndarray.item(slack)
 		
 		if isinstance(slack, (int, float)):
 			if slack < 0:
