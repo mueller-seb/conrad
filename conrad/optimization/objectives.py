@@ -299,9 +299,9 @@ class NontargetObjectiveSquare(TreatmentObjective):
 		:math:`\omega\equiv```voxel_weights``
 		"""
 		if voxel_weights is None:
-			return self.weight * np.sum(y**2)
+			return self.weight * 0.5 * np.sum(y**2)
 		else:
-			return self.weight * np.dot(voxel_weights, y**2)
+			return self.weight * 0.5 * np.dot(voxel_weights, y**2)
 
 	def dual_eval(self, nu, voxel_weights=None):
 		""" Return ``0``"""
@@ -313,16 +313,16 @@ class NontargetObjectiveSquare(TreatmentObjective):
 		Return :math:`c * \omega^T y^2`, for :math:`\omega\equiv```voxel_weights``
 		"""
 		if voxel_weights is None:
-			return self.weight * cvxpy.sum(y_var**2)
+			return self.weight * 0.5 * cvxpy.sum(y_var**2)
 		else:
-			return self.weight * cvxpy.sum(
+			return self.weight * 0.5 * cvxpy.sum(
 					cvxpy.multiply(voxel_weights, y_var**2))
 
 	def primal_expr_Ax(self, A, x_var, voxel_weights=None):
 		if voxel_weights is None:
-			return self.weight * cvxpy.sum((x_var.T @ A.T)**2)
+			return self.weight * 0.5 * cvxpy.sum((x_var.T @ A.T)**2)
 		else:
-			return self.weight * cvxpy.sum(
+			return self.weight * 0.5 * cvxpy.sum(
 					cvxpy.multiply(voxel_weights, (x_var.T @ A.T).T**2))
 
 	def dual_expr(self, nu_var, voxel_weights=None):
@@ -523,10 +523,10 @@ class TargetObjectiveSquare(TreatmentObjective):
 		residuals = vec(y) - float(self.target_dose)
 		if voxel_weights is None:
 			return float(
-					self.weight * np.sum(residuals**2))
+					self.weight * 0.5 * np.sum(residuals**2))
 		else:
 			return float(
-					self.weight * np.dot(voxel_weights, residuals**2))
+					self.weight * 0.5 * np.dot(voxel_weights, residuals**2))
 
 	def dual_eval(self, nu, voxel_weights=None):
 		r"""
@@ -541,16 +541,16 @@ class TargetObjectiveSquare(TreatmentObjective):
 	def primal_expr(self, y_var, voxel_weights=None):
 		residuals = y_var.T - float(self.target_dose)
 		if voxel_weights is not None:
-			return self.weight * cvxpy.sum(cvxpy.multiply(voxel_weights, residuals.T**2))
+			return self.weight * 0.5 * cvxpy.sum(cvxpy.multiply(voxel_weights, residuals.T**2))
 		else:
-			return self.weight * cvxpy.sum(residuals**2)
+			return self.weight * 0.5 * cvxpy.sum(residuals**2)
 
 	def primal_expr_Ax(self, A, x_var, voxel_weights=None):
 		residuals = (x_var.T @ A.T).T - float(self.target_dose)
 		if voxel_weights is not None:
-			return self.weight * cvxpy.sum(cvxpy.multiply(voxel_weights, residuals**2))
+			return self.weight * 0.5 * cvxpy.sum(cvxpy.multiply(voxel_weights, residuals**2))
 		else:
-			return self.weight * cvxpy.sum(residuals**2)
+			return self.weight * 0.5 * cvxpy.sum(residuals**2)
 
 	def dual_expr(self, nu_var, voxel_weights=None):
 		#if voxel_weights is None:
