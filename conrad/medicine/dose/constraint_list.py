@@ -64,7 +64,7 @@ class ConstraintList(object):
 			:obj:`str`: Seven character key.
 		"""
 		return hashlib.sha1(str(
-				str(time.clock()) +
+				str(time.perf_counter()) +
 				str(constraint.dose) +
 				str(constraint.threshold) +
 				str(constraint.relop)
