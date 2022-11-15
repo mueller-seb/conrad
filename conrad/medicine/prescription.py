@@ -201,7 +201,8 @@ class Prescription(object):
 					else:
 						rx_dose = dose = dose_from_string(item['dose'])
 
-				s = Structure(label, name, is_target, dose=dose)
+				DBOF = item['DBOF']
+				s = Structure(label, name, is_target, dose=dose, DBOF=DBOF)
 				self.add_structure_to_dictionaries(s)
 
 				if 'constraints' in item:
