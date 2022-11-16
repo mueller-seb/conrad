@@ -38,6 +38,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with CONRAD.  If not, see <http://www.gnu.org/licenses/>.
 """
+import warnings
 from conrad.compat import *
 
 import abc
@@ -76,7 +77,8 @@ class AbstractNonnegativeUnit(object):
 			raise TypeError('argument "value" must be of type {} or '
 							'{}'.format(int, float))
 		elif value < 0:
-			raise ValueError('argument "value" must be nonnegative')
+			##raise ValueError('argument "value" must be nonnegative')
+			warnings.warn('argument "value" must be nonnegative')
 		else:
 			self.__value = float(value)
 

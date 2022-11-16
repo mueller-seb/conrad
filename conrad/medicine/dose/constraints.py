@@ -33,6 +33,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with CONRAD.  If not, see <http://www.gnu.org/licenses/>.
 """
+import warnings
 from conrad.compat import *
 
 import time
@@ -271,8 +272,10 @@ class Constraint(object):
 		
 		if isinstance(slack, (int, float)):
 			if slack < 0:
-				raise ValueError('argument "slack" must be nonnegative '
-								 'by convention')
+				##raise ValueError('argument "slack" must be nonnegative '
+				##				 'by convention')
+				warnings.warn('argument "slack" must be nonnegative '
+								 'by convention; setting slack to zero')
 			self.__slack = max(0., float(slack))
 		else:
 			raise TypeError('argument "slack" must be of type {} with '
