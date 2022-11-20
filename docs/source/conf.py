@@ -27,6 +27,7 @@ __version__ = "0.0.2"
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('../../conrad'))
 sys.path.insert(0, os.path.abspath('../../conrad/medicine'))
+sys.path.insert(0, os.path.abspath('../../conrad/medicine/dose'))
 sys.path.insert(0, os.path.abspath('../../conrad/physics'))
 sys.path.insert(0, os.path.abspath('../../conrad/optimization'))
 sys.path.insert(0, os.path.abspath('../../conrad/visualization'))
