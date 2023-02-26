@@ -495,14 +495,15 @@ if module_installed('cvxpy'):
 				structures = structures.list
 			# A, dose, weight_abs, weight_lin = \
 					# self._Solver__gather_matrix_and_coefficients(structures)
-			
-			self.problem = cvxpy.Problem(cvxpy.Minimize(0), self.problem.constraints)
+
+			if 'tau' in options:
+				self.problem = cvxpy.Problem(cvxpy.Minimize(options['tau']*cvxpy.norm(self.__x, 1)), self.problem.constraints)
+			else:
+				self.problem = cvxpy.Problem(cvxpy.Minimize(0), self.problem.constraints)
 			for s in structures:
 				objective = cvxpy.Minimize(ObjectiveMethods.expr(s, self.__x))
 				self.problem = cvxpy.Problem(self.problem.objective + objective, self.problem.constraints)
 				self.__add_constraints(s, exact=exact)
-			if 'tau' in options:
-				self.problem = cvxpy.Problem(self.problem.objective + options['tau']*cvxpy.Minimize(cvxpy.norm(self.__x, 1)), self.problem.constraints)
 
 			# self.problem.objective = cvxpy.Minimize(
 			# 		weight_abs.T * cvxpy.abs(A * self.__x - dose) +
