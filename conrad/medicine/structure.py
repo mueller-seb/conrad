@@ -129,7 +129,7 @@ class Structure(object):
 			if DBOF == 'SQR':
 				constructor_default = (TargetObjectiveSquare if is_target
 				else NontargetObjectiveSquare)
-			else:
+			elif DBOF == 'PWL':
 				constructor_default = (TargetObjectivePWL if is_target
 				else NontargetObjectiveLinear)
 			objective_constructor = options.pop(
