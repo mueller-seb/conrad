@@ -201,8 +201,17 @@ class Prescription(object):
 					else:
 						rx_dose = dose = dose_from_string(item['dose'])
 
+
 				DBOF = item['DBOF']
-				s = Structure(label, name, is_target, dose=dose, DBOF=DBOF)
+				if 'weight' in item:
+					w = item['weight']
+					s = Structure(label, name, is_target, dose=dose, DBOF=DBOF, weight=w)
+				elif 'weight_underdose' in item and 'weight_overdose' in item:
+					w_u = item['weight_underdose']
+					w_o = item['weight_overdose']
+					s = Structure(label, name, is_target, dose=dose, DBOF=DBOF, weight_underdose=w_u, weight_overdose=w_o)
+				else:
+					s = Structure(label, name, is_target, dose=dose, DBOF=DBOF)
 				self.add_structure_to_dictionaries(s)
 
 				if 'constraints' in item:
